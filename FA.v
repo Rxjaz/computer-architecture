@@ -8,6 +8,14 @@ module FA (
 	output C_out
 );
 
+/*
+module HA (
+	input A,
+	input B,
+	output S,
+	output C
+); */
+
 wire C1, C2, C3;
 
 HA juan (.A(X), .B(Y), .S(C1), .C(C2));
