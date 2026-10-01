@@ -4,6 +4,7 @@ Notes/
 work/
 
 *.mti
+*.ini
 *.mpf
 *.bak
 *.wlf
