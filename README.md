@@ -50,7 +50,7 @@ The [`Reports/`](Reports/) folder contains the report for each activity, with th
 
 ## Author
 
-**[@Rxjaz]** — Student at CUCEI, Universidad de Guadalajara.
+[@Rxjaz](https://github.com/Rxjaz) — Student at CUCEI, Universidad de Guadalajara.
 
 ---
 
