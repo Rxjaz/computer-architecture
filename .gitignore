@@ -9,4 +9,7 @@ work/
 *.bak
 *.wlf
 *.vstf
+*.vcd
+
 transcript
+Activities/05_Datapath/initData
