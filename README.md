@@ -22,7 +22,8 @@ The repository is split into two parts:
 │   ├── 02_16_Bits_FA/    # Adders: HA, FA, 4-bit and 16-bit
 │   ├── 03_MUX6_1/        # 6:1 multiplexer with operations
 │   ├── 04_ALU/           # 32-bit MIPS ALU
-│   └── 05_Datapath/      # RARO SUPREME: instruction ROM driving ROM, RAM and ALU
+│   ├── 05_RARO/          # RARO SUPREME: instruction ROM driving ROM, RAM and ALU
+│   └── 06_BBVA/          # Register bank (BR) + ALU datapath
 ├── MIPS_Project/         # Final project: MIPS processor
 └── Reports/              # PDF reports for each activity
 ```
@@ -48,7 +49,29 @@ Modules:
 - `RARO.v`: first version, with the control signals as separate inputs.
 - `RARO_SUPREME.v`: decodes the instruction fields (`RARO_SUPREME`) and wires the instruction ROM to it (`SISTEMA_RARO`).
 
-> The memory files are loaded with `$readmemb` using relative paths, so run the simulation from `Activities/05_Datapath/`.
+> The memory files are loaded with `$readmemb` using relative paths, so run the simulation from `Activities/05_RARO/`.
+
+## Activity 06 — BBVA (Register Bank + ALU)
+
+A combinational datapath that connects a **32×32-bit register bank** (`BR`) to the **MIPS ALU**. Two registers are read, the ALU operates on them and the result is written back into the bank.
+
+Each instruction is 20 bits wide:
+
+| Bits | Field | Description |
+|------|-------|-------------|
+| `[19:16]` | `Sel` | ALU operation (`0` AND, `1` OR, `2` ADD, `6` SUB, `7` SLT, `12` NOR) |
+| `[15]` | `WE` | Register write enable (`1` = write the ALU result into `AW`) |
+| `[14:10]` | `AR1` | Read register 1 → ALU operand `A` |
+| `[9:5]` | `AR2` | Read register 2 → ALU operand `B` |
+| `[4:0]` | `AW` | Destination register for the ALU result |
+
+Modules:
+
+- `BR.v`: register bank with two read ports (`DR1`, `DR2`) and one write port, initialized from `data`.
+- `ALU.v`: the 32-bit MIPS ALU from Activity 04.
+- `BBVA.v`: splits the instruction into its fields and wires `BR` and `ALU` together; outputs the ALU result (`DD`) and the zero flag (`ZF`).
+
+> The register file is loaded with `$readmemb("data", ...)`, so run the simulation from `Activities/06_BBVA/`.
 
 ## Testbenches
 
@@ -62,6 +85,8 @@ Each testbench, with the activity it belongs to and the module it tests:
 | 03 | `Mux6_1_TB.v` | `Mux6_1` (`Mux6_1.v`) | All 6 `Sel` values with random inputs (`$random`) over 5 iterations. |
 | 04 | `MIPSALU_TB.v` | `MIPSALU` (`MIPSALU.v`) | Every ALU operation with three operand pairs, including `0xFFFFFFFF + 1`, to check the `ZF` flag. |
 | 05 | `RARO_SUPREME_TB.v` | `SISTEMA_RARO` (`RARO_SUPREME.v`) | Sweeps the 16 instructions of `mem_instrucciones` (`selector` 0–15), printing the instruction, `DD` and `ZF`, and dumps `raro_supreme.vcd`. |
+| 06 | `BR_TB.v` | `BR` (`BR.v`) | Writes `0x12345678` into register 5, then reads it back with `WE = 0`. |
+| 06 | `BBVA_TB.v` | `BBVA` (`BBVA.v`) | Runs `ADD` on registers 2 and 3 (`0010 1 00010 00011 00000`) and writes the result into register 0. |
 
 ## Tools
 
