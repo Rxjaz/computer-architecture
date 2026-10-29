@@ -1,15 +1,32 @@
-Computer Architecture Notes/
-Sources/
+# ModelSim / Questa
 
 work/
-
+transcript
+*.mpf
 *.mti
 *.ini
-*.mpf
-*.bak
 *.wlf
-*.vstf
 *.vcd
+*.vstf
 
-transcript
+# Quartus Prime
+
+db/
+incremental_db/
+output_files/
+simulation/
+*.qws
+*.rpt
+*.summary
+*.smsg
+*.done
+*.sld
+*.jdi
+*.pin
+*.pof
+*.sof
+
+# Project-specific folders / files
+
+Sources/
 Activities/05_RARO/initData
