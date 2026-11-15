@@ -1,101 +1,31 @@
-# Computer Architecture — MIPS Processor in Verilog
+# Computer Architecture — Verilog Activities
 
-> **Work in progress.**
+> **Work in progress:** the course is still ongoing.
 
-School project for the **Computer Architecture** course (CUCEI). The final goal is to design and implement a **complete MIPS processor** in **Verilog**. The project is built in stages: it starts with basic digital components that are gradually integrated into the datapath and the control unit.
-
-## Goal
-
-Implement a 32-bit MIPS processor capable of running a subset of the MIPS ISA (R, I and J-type instructions).
+Class activities for the **Computer Architecture** course at CUCEI. Each activity designs and tests a digital component in **Verilog**, starting from basic logic and building up to MIPS processor blocks.
 
 ## Structure
 
-The repository is split into two parts:
-
-- **`Activities/`**: class assignments. Each folder is an independent activity where a single component is designed and tested on its own.
-- **`MIPS_Project/`**: the final project. This is where the components from the activities will be integrated into the complete MIPS processor.
-
 ```
 .
-├── Activities/           # Class activities
-│   ├── 01_Logic_Gates/   # Basic logic gates
-│   ├── 02_16_Bits_FA/    # Adders: HA, FA, 4-bit and 16-bit
-│   ├── 03_MUX6_1/        # 6:1 multiplexer with operations
-│   ├── 04_ALU/           # 32-bit MIPS ALU
-│   ├── 05_RARO/          # RARO SUPREME: instruction ROM driving ROM, RAM and ALU
-│   └── 06_BBVA/          # Register bank (BR) + ALU datapath
-├── MIPS_Project/         # Final project: MIPS processor
-└── Reports/              # PDF reports for each activity
+├── Activities/   # Class activities, one folder per assignment
+├── DE10-Lite/    # Tests and experiments on the DE10-Lite FPGA board
+└── Reports/      # PDF reports for the activities
 ```
 
-## Activity 05 — RARO SUPREME Datapath
-
-A small combinational datapath that connects a data **ROM**, a **RAM** and the **MIPS ALU**, driven by a 16-word **instruction ROM** (no clock or PC: a 4-bit `selector` picks the instruction).
-
-Each instruction is 23 bits wide:
-
-| Bits | Field | Description |
-|------|-------|-------------|
-| `[22:17]` | `DROM` | ROM address → ALU operand `A` |
-| `[16:11]` | `DRAM` | RAM address → ALU operand `B` |
-| `[10]` | `WE` | RAM write enable (`1` = write, `0` = read) |
-| `[9:4]` | `DataIn` | 6-bit value written to RAM (zero-extended to 32 bits) |
-| `[3:0]` | `OP` | ALU operation (`0` AND, `1` OR, `2` ADD, `6` SUB, `7` SLT, `12` NOR) |
-
-Modules:
-
-- `ROM.v` / `RAM.v`: 64×32-bit memories initialized from `memrom` and `memram`.
-- `ROM_INSTRUCCIONES.v`: 16×23-bit instruction memory loaded from `mem_instrucciones`.
-- `RARO.v`: first version, with the control signals as separate inputs.
-- `RARO_SUPREME.v`: decodes the instruction fields (`RARO_SUPREME`) and wires the instruction ROM to it (`SISTEMA_RARO`).
-
-> The memory files are loaded with `$readmemb` using relative paths, so run the simulation from `Activities/05_RARO/`.
-
-## Activity 06 — BBVA (Register Bank + ALU)
-
-A combinational datapath that connects a **32×32-bit register bank** (`BR`) to the **MIPS ALU**. Two registers are read, the ALU operates on them and the result is written back into the bank.
-
-Each instruction is 20 bits wide:
-
-| Bits | Field | Description |
-|------|-------|-------------|
-| `[19:16]` | `Sel` | ALU operation (`0` AND, `1` OR, `2` ADD, `6` SUB, `7` SLT, `12` NOR) |
-| `[15]` | `WE` | Register write enable (`1` = write the ALU result into `AW`) |
-| `[14:10]` | `AR1` | Read register 1 → ALU operand `A` |
-| `[9:5]` | `AR2` | Read register 2 → ALU operand `B` |
-| `[4:0]` | `AW` | Destination register for the ALU result |
-
-Modules:
-
-- `BR.v`: register bank with two read ports (`DR1`, `DR2`) and one write port, initialized from `data`.
-- `ALU.v`: the 32-bit MIPS ALU from Activity 04.
-- `BBVA.v`: splits the instruction into its fields and wires `BR` and `ALU` together; outputs the ALU result (`DD`) and the zero flag (`ZF`).
-
-> The register file is loaded with `$readmemb("data", ...)`, so run the simulation from `Activities/06_BBVA/`.
-
-## Testbenches
-
-Each testbench, with the activity it belongs to and the module it tests:
-
-| Activity | Testbench | Module | What it checks |
-|----------|-----------|--------|----------------|
-| 02 | `Mario_TB.v` | `FA` (`FA.v`) | 1-bit Full Adder with several combinations of `X`, `Y` and `C_in`. |
-| 02 | `Raul_TB.v` | `S4B` (`4BFA.v`) | 4-bit adder with several sums (3+5, 6+1, 2+2, 3+3, 5+6). |
-| 02 | `Victor_TB.v` | `S16B` (`16BFA.v`) | 16-bit adder with negative values and overflow cases (`32767 + 1`, `65535 + 1`). |
-| 03 | `Mux6_1_TB.v` | `Mux6_1` (`Mux6_1.v`) | All 6 `Sel` values with random inputs (`$random`) over 5 iterations. |
-| 04 | `MIPSALU_TB.v` | `MIPSALU` (`MIPSALU.v`) | Every ALU operation with three operand pairs, including `0xFFFFFFFF + 1`, to check the `ZF` flag. |
-| 05 | `RARO_SUPREME_TB.v` | `SISTEMA_RARO` (`RARO_SUPREME.v`) | Sweeps the 16 instructions of `mem_instrucciones` (`selector` 0–15), printing the instruction, `DD` and `ZF`, and dumps `raro_supreme.vcd`. |
-| 06 | `BR_TB.v` | `BR` (`BR.v`) | Writes `0x12345678` into register 5, then reads it back with `WE = 0`. |
-| 06 | `BBVA_TB.v` | `BBVA` (`BBVA.v`) | Runs `ADD` on registers 2 and 3 (`0010 1 00010 00011 00000`) and writes the result into register 0. |
+- **`Activities/`**: each folder is an independent activity with its Verilog modules, testbenches and simulation files.
+- **`DE10-Lite/`**: designs synthesized and tested on the Terasic DE10-Lite (MAX 10) board, such as VGA output.
+- **`Reports/`**: reports with the design explanation and simulation results.
 
 ## Tools
 
 - **Language:** Verilog HDL
 - **Simulation:** ModelSim
+- **Synthesis:** Intel Quartus Prime (DE10-Lite)
 
-## Reports
+## Running a simulation
 
-The [`Reports/`](Reports/) folder contains the report for each activity, with the design explanation and simulation results.
+Most activities load memory files with `$readmemb`/`$readmemh` using relative paths, so run the simulation from inside the activity's folder (several include a `sim.do` script for ModelSim).
 
 ## Author
 
