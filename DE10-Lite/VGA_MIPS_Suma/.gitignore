@@ -1,0 +1,10 @@
+db/
+incremental_db/
+output_files/
+simulation/
+work/
+*.qws
+*.wlf
+transcript
+frame_sim.ppm
+frame_sim.png
